@@ -1,0 +1,32 @@
+[
+  {
+    "id": 1,
+    "username": "admin123",
+    "email": "admin@company.com",
+    "password": "AdminPass123!"
+  },
+  {
+    "id": 2,
+    "username": "john_doe",
+    "email": "john.doe@email.com",
+    "password": "SecurePass456!"
+  },
+  {
+    "id": 3,
+    "username": "jane_smith",
+    "email": "jane.smith@email.com",
+    "password": "StrongPass789!"
+  },
+  {
+    "id": 4,
+    "username": "demo_user",
+    "email": "demo@example.com",
+    "password": "DemoPass123!"
+  },
+  {
+    "id": 5,
+    "username": "test_admin",
+    "email": "test.admin@company.com",
+    "password": "TestAdmin456!"
+  }
+]

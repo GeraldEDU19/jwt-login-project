@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f8f9fa;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .login-container {
+            width: 100%;
+            max-width: 1200px;
+            padding: 15px;
+            margin: auto;
+        }
+        .login-form {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+        }
+        .users-section {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container login-container">
+        <div class="row">
+            <div class="col-md-4">
+                <div class="login-form">
+                    <h2 class="text-center mb-4">Login</h2>
+                    
+                    <form id="loginForm">
+                        <div class="mb-3">
+                            <label for="username" class="form-label">Username</label>
+                            <input type="text" class="form-control" id="username" name="username" required autofocus>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="password" class="form-label">Password</label>
+                            <input type="password" class="form-control" id="password" name="password" required>
+                        </div>
+                        
+                        <div class="mb-3 form-check">
+                            <input type="checkbox" class="form-check-input" id="remember-me" name="remember">
+                            <label class="form-check-label" for="remember-me">Remember me</label>
+                        </div>
+                        
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary">Login</button>
+                        </div>
+                        
+                        <div id="errorAlert" class="alert alert-danger mt-3" role="alert" style="display: none;">
+                        </div>
+                        
+                        <div id="successAlert" class="alert alert-success mt-3" role="alert" style="display: none;">
+                        </div>
+                    </form>
+                </div>
+            </div>
+            
+            <div class="col-md-8">
+                <!-- Users section -->
+                <div id="usersSection" class="users-section" style="display: none;">
+                    <h4 class="text-center mb-3">Registered Users</h4>
+                    <div id="usersList" class="table-responsive">
+                        <!-- Users table will be displayed here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('loginForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const remember = document.getElementById('remember-me').checked;
+            
+            const errorAlert = document.getElementById('errorAlert');
+            const successAlert = document.getElementById('successAlert');
+            const usersSection = document.getElementById('usersSection');
+            
+            // Hide previous alerts
+            errorAlert.style.display = 'none';
+            successAlert.style.display = 'none';
+            usersSection.style.display = 'none';
+            
+            try {
+                const response = await fetch('/api/users/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ username, password, remember })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    successAlert.textContent = data.message || 'Login successful';
+                    successAlert.style.display = 'block';
+                    
+                    // Load and display users after successful login
+                    await loadUsers();
+                    
+                } else {
+                    errorAlert.textContent = data.error || 'Login error';
+                    errorAlert.style.display = 'block';
+                }
+            } catch (error) {
+                errorAlert.textContent = 'Connection error. Please try again.';
+                errorAlert.style.display = 'block';
+            }
+        });
+
+        // Function to load all users
+        async function loadUsers() {
+            try {
+                const response = await fetch('/api/users/all');
+                const data = await response.json();
+                
+                if (response.ok && data.success) {
+                    displayUsers(data.users);
+                    document.getElementById('usersSection').style.display = 'block';
+                } else {
+                    console.error('Error loading users:', data.error);
+                }
+            } catch (error) {
+                console.error('Error loading users:', error);
+            }
+        }
+
+        // Function to display users in a table
+        function displayUsers(users) {
+            const usersList = document.getElementById('usersList');
+            
+            if (users.length === 0) {
+                usersList.innerHTML = '<p class="text-center">No registered users found</p>';
+                return;
+            }
+
+            let tableHTML = `
+                <table class="table table-striped table-hover">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>ID</th>
+                            <th>Username</th>
+                            <th>Email</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+
+            users.forEach(user => {
+                tableHTML += `
+                    <tr>
+                        <td>${user.id}</td>
+                        <td>${user.username}</td>
+                        <td>${user.email}</td>
+                    </tr>
+                `;
+            });
+
+            tableHTML += `
+                    </tbody>
+                </table>
+            `;
+
+            usersList.innerHTML = tableHTML;
+        }
+    </script>
+</body>
+</html>
