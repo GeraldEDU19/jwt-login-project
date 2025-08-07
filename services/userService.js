@@ -65,14 +65,10 @@ class UserService {
         }
     }
 
-    getAllUsers() {
+    async getAllUsers() {
         try {
-            console.log('📋 Getting all users');
-            const users = userRepository.getAllUsers();
-            console.log(`✅ Found ${users.length} users`);
-            return users;
+            return await userRepository.getAllUsers();
         } catch (error) {
-            console.error('❌ Error getting users:', error.message);
             throw error;
         }
     }
